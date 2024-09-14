@@ -1,8 +1,8 @@
 sealed class Argument {}
 
-sealed class Number {}
-
 sealed class Memorizable {}
+
+sealed class Number implements Memorizable {}
 
 sealed class StackIntFloat {}
 

@@ -45,9 +45,9 @@ class STOREInstruction implements Instruction {
 
 class STOREHInstruction implements Instruction {
   // STOREH $ %
-  final Stkptr stkptr;
-  final Memptr memptr;
-  STOREHInstruction(this.stkptr, this.memptr);
+  final StackIntFloat src;
+  final Memptr dest;
+  STOREHInstruction(this.src, this.dest);
 }
 
 class REMLInstruction implements Instruction {
