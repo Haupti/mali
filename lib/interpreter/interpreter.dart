@@ -20,8 +20,10 @@ class Stack {
     _mem.add(value);
   }
 
-  Memorizable pop() {
-    if (_mem.isEmpty) {}
+  Memorizable? pop() {
+    if (_mem.isEmpty) {
+      return null;
+    }
     return _mem.last;
   }
 
@@ -34,6 +36,10 @@ class Stack {
       return null;
     }
     return _mem.last;
+  }
+
+  int depth() {
+    return _mem.length;
   }
 }
 
@@ -68,6 +74,123 @@ class Interpreter {
     for (i = 0; i < instructions.length; i++) {
       instr = instructions[i];
       switch (instr) {
+        case ORInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(OR, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(runOr(i, head, hot));
+        case ANDInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(AND, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(runAnd(i, head, hot));
+        case MODInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(MOD, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(runMod(i, head, hot));
+        case DIVInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(DIV, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(runDiv(i, head, hot));
+        case MULInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(MUL, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(runMul(i, head, hot));
+        case SUBInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(SUB, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(runSub(i, head, hot));
+        case ADDInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(ADD, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(runAdd(i, head, hot));
+        case EQVInstruction _:
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError(
+                "(EQV, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable? head = stacks[instr.stkptr.value]!.pop();
+          if (head == null) {
+            throw RuntimeError(
+                "(EQV, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          stacks[instr.stkptr.value]!.push(head.isEqualTo(instr.value));
+        case EQInstruction _:
+          if (stacks[instr.stkptr.value] == null ||
+              stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError(
+                "(EQ, $i) not enough values on stack: ${instr.stkptr.value}");
+          }
+          Memorizable head = stacks[instr.stkptr.value]!.pop()!;
+          Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
+          stacks[instr.stkptr.value]!.push(head.isEqualTo(hot));
+        case POPInstruction _:
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError(
+                "(POP, $i) stack is empty: ${instr.stkptr.value}");
+          }
+          stacks[instr.stkptr.value]!.pop();
+        case MOVInstruction _:
+          if (stacks[instr.src.value] == null) {
+            throw RuntimeError(
+                "(MOV, $i) move soure is empty: ${instr.src.value}");
+          }
+          if (stacks[instr.dest.value] == null) {
+            stacks[instr.dest.value] = Stack.init();
+          }
+          Memorizable? val = stacks[instr.src.value]!.pop();
+          if (val == null) {
+            throw RuntimeError(
+                "(MOV, $i) move soure is empty: ${instr.src.value}");
+          }
+          stacks[instr.dest.value]!.push(val);
+        case CPYInstruction _:
+          if (stacks[instr.src.value] == null) {
+            throw RuntimeError(
+                "(CPY, $i) copy soure is empty: ${instr.src.value}");
+          }
+          if (stacks[instr.dest.value] == null) {
+            stacks[instr.dest.value] = Stack.init();
+          }
+          Memorizable? val = stacks[instr.src.value]!.peekHead();
+          if (val == null) {
+            throw RuntimeError(
+                "(CPY, $i) copy soure is empty: ${instr.src.value}");
+          }
+          stacks[instr.dest.value]!.push(val);
         case PUSHInstruction _:
           Stack? stk = stacks[instr.stkptr.value];
           if (stk == null) {
@@ -96,11 +219,11 @@ class Interpreter {
           if (res == null) {
             throw RuntimeError("(JMP1, $i) label not defined");
           }
-          var stack = stacks[instr.stkptr.value];
+          Stack? stack = stacks[instr.stkptr.value];
           if (stack == null || stack.peekHead() == null) {
             throw RuntimeError("(JMP1, $i) stack empty: ${instr.stkptr.value}");
           }
-          var val = stack.peekHead();
+          Memorizable? val = stack.peekHead();
           if (val is Integer && val.value == 1) {
             i = res - 1;
           }
@@ -109,11 +232,11 @@ class Interpreter {
           if (res == null) {
             throw RuntimeError("(JMP0, $i) label not defined");
           }
-          var stack = stacks[instr.stkptr.value];
+          Stack? stack = stacks[instr.stkptr.value];
           if (stack == null || stack.peekHead() == null) {
             throw RuntimeError("(JMP0, $i) stack empty: ${instr.stkptr.value}");
           }
-          var val = stack.peekHead();
+          Memorizable? val = stack.peekHead();
           if (val is Integer && val.value == 0) {
             i = res - 1;
           }
@@ -170,7 +293,11 @@ class Interpreter {
               if (stacks[stk.value] == null) {
                 throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
               } else {
-                memory[instr.dest.value]!.insert(0, stacks[stk.value]!.pop());
+                Memorizable? value = stacks[stk.value]!.pop();
+                if (value == null) {
+                  throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
+                }
+                memory[instr.dest.value]!.insert(0, value);
               }
           }
         case STOREInstruction _:
@@ -187,7 +314,11 @@ class Interpreter {
               if (stacks[stk.value] == null) {
                 throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
               } else {
-                memory[instr.dest.value]!.add(stacks[stk.value]!.pop());
+                Memorizable? value = stacks[stk.value]!.pop();
+                if (value == null) {
+                  throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
+                }
+                memory[instr.dest.value]!.add(value);
               }
           }
 
@@ -206,7 +337,7 @@ class Interpreter {
           }
           memory.remove(instr.memptr.value);
         case LOADInstruction _:
-          var mem = memory[instr.memptr.value];
+          List<Memorizable>? mem = memory[instr.memptr.value];
           if (mem == null) {
             throw RuntimeError(
                 "(LOAD, $i) memory is not allocated ${instr.memptr.value}");
@@ -219,7 +350,7 @@ class Interpreter {
           }
           stacks[instr.stkptr.value]!.push(mem[instr.pos]);
         case LOADHInstruction _:
-          var mem = memory[instr.memptr.value];
+          List<Memorizable>? mem = memory[instr.memptr.value];
           if (mem == null) {
             throw RuntimeError(
                 "(LOADH, $i) memory is not allocated ${instr.memptr.value}");
@@ -232,7 +363,7 @@ class Interpreter {
           }
           stacks[instr.stkptr.value]!.push(mem.first);
         case LOADLInstruction _:
-          var mem = memory[instr.memptr.value];
+          List<Memorizable>? mem = memory[instr.memptr.value];
           if (mem == null) {
             throw RuntimeError(
                 "(LOADH, $i) memory is not allocated ${instr.memptr.value}");
@@ -246,16 +377,180 @@ class Interpreter {
           stacks[instr.stkptr.value]!.push(mem.last);
       }
     }
+    return 1;
+  }
+
+  static Memorizable runOr(int index, Memorizable fst, Memorizable snd) {
+    switch (fst) {
+      case Integer _:
+        switch (snd) {
+          case Integer _:
+            if (fst.value == 1 || snd.value == 1) {
+              return Integer(1);
+            }
+            return Integer(0);
+          default:
+            throw RuntimeError("(OR, $index) expected integer values");
+        }
+
+      default:
+        throw RuntimeError("(OR, $index) expected integer values");
+    }
+  }
+
+  static Memorizable runAnd(int index, Memorizable fst, Memorizable snd) {
+    switch (fst) {
+      case Integer _:
+        switch (snd) {
+          case Integer _:
+            if (fst.value == 1 && snd.value == 1) {
+              return Integer(1);
+            }
+            return Integer(0);
+          default:
+            throw RuntimeError("(AND, $index) expected integer values");
+        }
+
+      default:
+        throw RuntimeError("(AND, $index) expected integer values");
+    }
+  }
+
+  static Memorizable runMod(int index, Memorizable fst, Memorizable snd) {
+    switch (fst) {
+      case Integer _:
+        switch (snd) {
+          case Integer _:
+            return Integer(fst.value % snd.value);
+          default:
+            throw RuntimeError(
+                "(MOD, $index) cannot calculate mod on non-integer values");
+        }
+
+      default:
+        throw RuntimeError(
+            "(MOD, $index) cannot calculate mod on non-integer values");
+    }
+  }
+
+  static Memorizable runDiv(int index, Memorizable fst, Memorizable snd) {
+    switch (fst) {
+      case Integer _:
+        switch (snd) {
+          case Integer _:
+            return Float(fst.value / snd.value);
+          case Float _:
+            return Float(fst.value / snd.value);
+          default:
+            throw RuntimeError(
+                "(DIV, $index) non-number values cannot be divided");
+        }
+      case Float _:
+        switch (snd) {
+          case Integer _:
+            return Float(fst.value / snd.value);
+          case Float _:
+            return Float(fst.value / snd.value);
+          default:
+            throw RuntimeError(
+                "(DIV, $index) non-number values cannot be divided");
+        }
+      default:
+        throw RuntimeError("(DIV, $index) non-number values cannot be divided");
+    }
+  }
+
+  static Memorizable runMul(int index, Memorizable fst, Memorizable snd) {
+    switch (fst) {
+      case Integer _:
+        switch (snd) {
+          case Integer _:
+            return Integer(fst.value * snd.value);
+          case Float _:
+            return Float(fst.value * snd.value);
+          default:
+            throw RuntimeError(
+                "(MUL, $index) non-number values cannot be multiplied");
+        }
+      case Float _:
+        switch (snd) {
+          case Integer _:
+            return Float(fst.value * snd.value);
+          case Float _:
+            return Float(fst.value * snd.value);
+          default:
+            throw RuntimeError(
+                "(MUL, $index) non-number values cannot be multiplied");
+        }
+      default:
+        throw RuntimeError(
+            "(MUL, $index) non-number values cannot be multiplied");
+    }
+  }
+
+  static Memorizable runSub(int index, Memorizable fst, Memorizable snd) {
+    switch (fst) {
+      case Integer _:
+        switch (snd) {
+          case Integer _:
+            return Integer(fst.value - snd.value);
+          case Float _:
+            return Float(fst.value - snd.value);
+          default:
+            throw RuntimeError(
+                "(SUB, $index) non-number values cannot be subracted");
+        }
+      case Float _:
+        switch (snd) {
+          case Integer _:
+            return Float(fst.value - snd.value);
+          case Float _:
+            return Float(fst.value - snd.value);
+          default:
+            throw RuntimeError(
+                "(SUB, $index) non-number values cannot be subracted");
+        }
+      default:
+        throw RuntimeError(
+            "(SUB, $index) non-number values cannot be subracted");
+    }
+  }
+
+  static Memorizable runAdd(int index, Memorizable fst, Memorizable snd) {
+    switch (fst) {
+      case Integer _:
+        switch (snd) {
+          case Integer _:
+            return Integer(fst.value + snd.value);
+          case Float _:
+            return Float(fst.value + snd.value);
+          default:
+            throw RuntimeError(
+                "(ADD, $index) non-number values cannot be added");
+        }
+      case Float _:
+        switch (snd) {
+          case Integer _:
+            return Float(fst.value + snd.value);
+          case Float _:
+            return Float(fst.value + snd.value);
+          default:
+            throw RuntimeError(
+                "(ADD, $index) non-number values cannot be added");
+        }
+      default:
+        throw RuntimeError("(ADD, $index) non-number values cannot be added");
+    }
   }
 
   static void runExit(Map<String, Stack> stacks, StackInt arg, int index) {
     switch (arg) {
       case Stkptr _:
-        var stack = stacks[arg.value];
+        Stack? stack = stacks[arg.value];
         if (stack == null) {
           throw RuntimeError("(EXIT, $index) no stack: ${arg.value}");
         }
-        var val = stack.pop();
+        Memorizable? val = stack.pop();
         if (val is Integer) {
           exit(val.value);
         } else {

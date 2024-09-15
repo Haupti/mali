@@ -1,6 +1,8 @@
 sealed class Argument {}
 
-sealed class Memorizable {}
+sealed class Memorizable {
+  Integer isEqualTo(Memorizable other);
+}
 
 sealed class Number implements Memorizable {}
 
@@ -12,16 +14,40 @@ class Integer
     implements Argument, Number, Memorizable, StackIntFloat, StackInt {
   final int value;
   Integer(this.value);
+
+  @override
+  Integer isEqualTo(Memorizable other) {
+    if (other is Integer && other.value == value) {
+      return Integer(1);
+    }
+    return Integer(0);
+  }
 }
 
 class Float implements Argument, Number, Memorizable, StackIntFloat {
   final double value;
   Float(this.value);
+
+  @override
+  Integer isEqualTo(Memorizable other) {
+    if (other is Float && other.value == value) {
+      return Integer(1);
+    }
+    return Integer(0);
+  }
 }
 
 class Memptr implements Argument, Memorizable {
   final String value;
   Memptr(this.value);
+
+  @override
+  Integer isEqualTo(Memorizable other) {
+    if (other is Memptr && other.value == value) {
+      return Integer(1);
+    }
+    return Integer(0);
+  }
 }
 
 class Stkptr implements Argument, StackIntFloat, StackInt {
