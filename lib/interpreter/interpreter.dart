@@ -58,11 +58,17 @@ class InstructionPointerStack {
     if (_iptrs.isEmpty) {
       return null;
     }
-    return _iptrs.last;
+    int pos = _iptrs.last;
+    _iptrs.removeLast();
+    return pos;
   }
 
   static InstructionPointerStack init() {
     return InstructionPointerStack([]);
+  }
+
+  int get length {
+    return _iptrs.length;
   }
 }
 
@@ -228,7 +234,7 @@ class Interpreter {
                   "(OUT, $i) memory expected to be integers only");
             }
           }).toList();
-          utf8.decode(ints);
+          print(utf8.decode(ints));
         case JMP1Instruction _:
           int? res = labelToInstr[instr.label.value];
           if (res == null) {
@@ -262,7 +268,7 @@ class Interpreter {
                 "(RET, $i) no instruction in instruction pointer stack to return to");
           }
           // because in next iteration, i will be incremented and THEN be at the right position
-          i = res + 1;
+          i = res;
         case GOTOInstruction _:
           int? res = labelToInstr[instr.label.value];
           if (res == null) {
@@ -278,8 +284,8 @@ class Interpreter {
                 "(CALL, $i) label not defined ${instr.label.value}");
           }
           // because in next iteration, i will be incremented and THEN be at the right position
-          i = res - 1;
           iptrs.push(i);
+          i = res - 1;
         case LABELInstruction _:
           continue;
         case REMLInstruction _:
@@ -392,7 +398,7 @@ class Interpreter {
           stacks[instr.stkptr.value]!.push(mem.last);
       }
     }
-    return 1;
+    return (1, labelToInstr, stacks, memory, iptrs);
   }
 
   static Memorizable runOr(int index, Memorizable fst, Memorizable snd) {

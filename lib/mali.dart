@@ -20,8 +20,8 @@ int run() {
       MOD \$fb
       EQV \$fb 0
 
-      CPY \$fb_args \$fb
       PUSH 5 \$fb
+      CPY \$fb_args \$fb
       MOD \$fb
       EQV \$fb 0
 
