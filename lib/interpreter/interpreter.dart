@@ -41,6 +41,10 @@ class Stack {
   int depth() {
     return _mem.length;
   }
+
+  List<Memorizable> debug() {
+    return _mem;
+  }
 }
 
 class InstructionPointerStack {
@@ -63,8 +67,19 @@ class InstructionPointerStack {
 }
 
 class Interpreter {
-  static int run(List<Instruction> instructions, Map<String, int> labelToInstr,
-      dynamic uft8) {
+  static int run(
+      List<Instruction> instructions, Map<String, int> labelToInstr) {
+    var (exitVal, _, _, _, _) = runDebug(instructions, labelToInstr);
+    return exitVal;
+  }
+
+  static (
+    int exitVal,
+    Map<String, int> labelToInstr,
+    Map<String, Stack> stacks,
+    Map<String, List<Memorizable>> memory,
+    InstructionPointerStack iptrs
+  ) runDebug(List<Instruction> instructions, Map<String, int> labelToInstr) {
     final Map<String, Stack> stacks = {};
     final Map<String, List<Memorizable>> memory = {};
     final InstructionPointerStack iptrs = InstructionPointerStack.init();
@@ -247,7 +262,7 @@ class Interpreter {
                 "(RET, $i) no instruction in instruction pointer stack to return to");
           }
           // because in next iteration, i will be incremented and THEN be at the right position
-          i = res;
+          i = res + 1;
         case GOTOInstruction _:
           int? res = labelToInstr[instr.label.value];
           if (res == null) {

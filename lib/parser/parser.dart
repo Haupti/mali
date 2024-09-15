@@ -8,141 +8,145 @@ typedef ParserResult = (
 
 class Parser {
   static ParserResult parse(String code) {
-    List<(int, String)> linesAndContents = _cleanLines(code);
+    List<String> linesAndContents = _cleanLines(code);
     Map<String, int> labelInstrPointers = {};
 
-    List<Instruction> instructions = [];
+    List<Instruction Function(Map<String, int>)> instructions = [];
     List<String> parts;
-    for (final (linenr, line) in linesAndContents) {
+    for (final (linenr, line) in linesAndContents.indexed) {
       parts = line.split(" ");
       switch (parts) {
         case ['REMH', String arg]:
-          instructions.add(REMHInstruction(
+          instructions.add((labels) => REMHInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, arg)));
         case ['REML', String arg]:
-          instructions.add(REMLInstruction(
+          instructions.add((labels) => REMLInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, arg)));
         case ['STOREH', String fst, String snd]:
-          instructions.add(STOREHInstruction(
+          instructions.add((labels) => STOREHInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, fst),
               _ArgumentParser.verifiedMemorypointer(linenr, snd)));
         case ['STORE', String fst, String snd]:
-          instructions.add(STOREInstruction(
+          instructions.add((labels) => STOREInstruction(
               _ArgumentParser.verifiedStackIntFloat(linenr, fst),
               _ArgumentParser.verifiedMemorypointer(linenr, snd)));
         case ['LOADL', String memptr, String stkptr]:
-          instructions.add(LOADLInstruction(
+          instructions.add((labels) => LOADLInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, memptr),
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['LOADH', String memptr, String stkptr]:
-          instructions.add(LOADHInstruction(
+          instructions.add((labels) => LOADHInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, memptr),
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['LOAD', String memptr, String pos, String stkptr]:
-          instructions.add(LOADInstruction(
+          instructions.add((labels) => LOADInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, memptr),
               _ArgumentParser.verifiedInteger(linenr, pos).value,
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['JMP0', String stkptr, String label]:
-          instructions.add(JMP0Instruction(
+          instructions.add((labels) => JMP0Instruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr),
-              _ArgumentParser.verifiedLabel(
-                  linenr, labelInstrPointers, label)));
+              _ArgumentParser.verifiedLabel(linenr, labels, label)));
         case ['JMP1', String stkptr, String label]:
-          instructions.add(JMP1Instruction(
+          instructions.add((labels) => JMP1Instruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr),
-              _ArgumentParser.verifiedLabel(
-                  linenr, labelInstrPointers, label)));
+              _ArgumentParser.verifiedLabel(linenr, labels, label)));
         case ['EXIT', String arg]:
-          instructions.add(
+          instructions.add((labels) =>
               EXITInstruction(_ArgumentParser.verifiedStackOrInt(linenr, arg)));
         case ['LABEL', String labelraw]:
           Label label = _ArgumentParser.verifiedNewLabel(
               linenr, labelInstrPointers, labelraw);
           labelInstrPointers[label.value] = linenr;
-          instructions.add(LABELInstruction(label));
+          instructions.add((_) => LABELInstruction(label));
         case ['GOTO', String labelraw]:
-          instructions.add(GOTOInstruction(_ArgumentParser.verifiedLabel(
-              linenr, labelInstrPointers, labelraw)));
+          instructions.add((labels) => GOTOInstruction(
+              _ArgumentParser.verifiedLabel(linenr, labels, labelraw)));
         case ['CALL', String label]:
-          instructions.add(CALLInstruction(_ArgumentParser.verifiedLabel(
-              linenr, labelInstrPointers, label)));
+          instructions.add((labels) => CALLInstruction(
+              _ArgumentParser.verifiedLabel(linenr, labels, label)));
         case ['ADD', String stkptr]:
-          instructions.add(ADDInstruction(
+          instructions.add((labels) => ADDInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['SUB', String stkptr]:
-          instructions.add(SUBInstruction(
+          instructions.add((labels) => SUBInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['MUL', String stkptr]:
-          instructions.add(MULInstruction(
+          instructions.add((labels) => MULInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['DIV', String stkptr]:
-          instructions.add(DIVInstruction(
+          instructions.add((labels) => DIVInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['MOD', String stkptr]:
-          instructions.add(MODInstruction(
+          instructions.add((labels) => MODInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['AND', String stkptr]:
-          instructions.add(ANDInstruction(
+          instructions.add((labels) => ANDInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['OR', String stkptr]:
-          instructions.add(ORInstruction(
+          instructions.add((labels) => ORInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['POP', String stkptr]:
-          instructions.add(POPInstruction(
+          instructions.add((labels) => POPInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['EQ', String stkptr]:
-          instructions.add(EQInstruction(
+          instructions.add((labels) => EQInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['OUT', String memptr]:
-          instructions.add(OUTInstruction(
+          instructions.add((labels) => OUTInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, memptr)));
         case ['ALLOC', String memptr]:
-          instructions.add(ALLOCInstruction(
+          instructions.add((labels) => ALLOCInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, memptr)));
         case ['FREE', String memptr]:
-          instructions.add(FREEInstruction(
+          instructions.add((labels) => FREEInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, memptr)));
         case ['RET']:
-          instructions.add(RETInstruction());
+          instructions.add((labels) => RETInstruction());
         case ['EQV', String stkptr, String value]:
-          instructions.add(EQVInstruction(
+          instructions.add((labels) => EQVInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr),
               _ArgumentParser.verifiedNumber(linenr, value)));
         case ['MOV', String src, String dest]:
-          instructions.add(MOVInstruction(
+          instructions.add((labels) => MOVInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, src),
               _ArgumentParser.verifiedStackpointer(linenr, dest)));
         case ['CPY', String src, String dest]:
-          instructions.add(CPYInstruction(
+          instructions.add((labels) => CPYInstruction(
               _ArgumentParser.verifiedStackpointer(linenr, src),
               _ArgumentParser.verifiedStackpointer(linenr, dest)));
         case ['PUSH', String value, String stkptr]:
-          instructions.add(PUSHInstruction(
+          instructions.add((labels) => PUSHInstruction(
               _ArgumentParser.verifiedNumber(linenr, value),
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         default:
           throw ParserError("invalid instruction or usage: $line", linenr);
       }
     }
-    return (instructions, labelInstrPointers);
+    return (
+      instructions.map((it) => it(labelInstrPointers)).toList(),
+      labelInstrPointers
+    );
   }
 
-  static List<(int, String)> _cleanLines(String code) {
+  static List<String> _cleanLines(String code) {
     List<String> linesWithComments =
         code.split("\n").map((it) => it.trim()).toList();
 
-    List<(int, String)> lineAndContent = [];
+    List<String> lineAndContent = [];
 
     String line;
     for (int i = 0; i < linesWithComments.length; i++) {
       line = linesWithComments[i];
+      if (line.isEmpty) {
+        continue;
+      }
       if (!line.startsWith(";")) {
         int commentStart = line.indexOf(";");
         if (commentStart == -1) {
-          lineAndContent.add((i, line));
+          lineAndContent.add(line);
         } else {
-          lineAndContent.add((i, line.substring(0, commentStart)));
+          lineAndContent.add(line.substring(0, commentStart));
         }
       }
     }

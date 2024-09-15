@@ -2,13 +2,18 @@ sealed class Argument {}
 
 sealed class Memorizable {
   Integer isEqualTo(Memorizable other);
+  String get txt;
 }
 
 sealed class Number implements Memorizable {}
 
-sealed class StackIntFloat {}
+sealed class StackIntFloat {
+  String get txt;
+}
 
-sealed class StackInt {}
+sealed class StackInt {
+  String get txt;
+}
 
 class Integer
     implements Argument, Number, Memorizable, StackIntFloat, StackInt {
@@ -22,6 +27,9 @@ class Integer
     }
     return Integer(0);
   }
+
+  @override
+  String get txt => "$value";
 }
 
 class Float implements Argument, Number, Memorizable, StackIntFloat {
@@ -35,6 +43,9 @@ class Float implements Argument, Number, Memorizable, StackIntFloat {
     }
     return Integer(0);
   }
+
+  @override
+  String get txt => "$value";
 }
 
 class Memptr implements Argument, Memorizable {
@@ -48,14 +59,22 @@ class Memptr implements Argument, Memorizable {
     }
     return Integer(0);
   }
+
+  @override
+  String get txt => value;
 }
 
 class Stkptr implements Argument, StackIntFloat, StackInt {
   final String value;
   Stkptr(this.value);
+
+  @override
+  String get txt => value;
 }
 
 class Label implements Argument {
   final String value;
   Label(this.value);
+
+  String get txt => value;
 }
