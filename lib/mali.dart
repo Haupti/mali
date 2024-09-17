@@ -1,6 +1,14 @@
+import 'dart:io';
+
 import 'package:mali/run.dart';
 
-int run() {
+int run(List<String> args) {
+  String code = File(args[0]).readAsStringSync();
+  return Runner.run(code);
+}
+
+/*
+   EXAMPLE
   String code = """
       ALLOC %fizzbuzz
       PUSH 122 %fizzbuzz
@@ -10,11 +18,14 @@ int run() {
       PUSH 100 %buzz
 
       LABEL main
+        ALLOC %fb_args
         PUSH 17 %fb_args
         CALL fizzbuzz
+        FREE %fb_args
         EXIT 0
 
       LABEL fizzbuzz
+        ALLOC %fb
         PUSH 3 %fb
         CPY %fb_args %fb
         MOD %fb
@@ -60,5 +71,4 @@ int run() {
         RET
 
       """;
-  return Runner.run(code);
-}
+   */
