@@ -9,12 +9,11 @@ class DataParser {
   static DataParserResult parse(String code) {
     List<String> lines = ParserUtils.cleanLines(code);
     Map<String, Stack> result = {};
-
     for (int i = 0; i < lines.length; i++) {
       int splitPos = lines[i].indexOf(" ");
       var (name, body) = (
         lines[i].substring(0, splitPos),
-        lines[i].substring(splitPos, lines[i].length)
+        lines[i].substring(splitPos+1, lines[i].length)
       );
 
       if (!name.startsWith('%')) {
@@ -48,6 +47,7 @@ class DataParser {
             stk.push(stkptr);
             continue;
           }
+          throw ParserError("no valid arguments", i);
         }
         result[name] = stk;
       }
