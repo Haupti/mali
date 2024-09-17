@@ -5,11 +5,11 @@ import 'package:mali/parser/parser.dart';
 
 class Runner {
   static int run(String code) {
-    var (instructions, labelToInstr) = Parser.parse(code);
-    return Interpreter.run(instructions, labelToInstr);
+    ParserResult parserResult = Parser.parse(code);
+    return Interpreter.run(parserResult);
   }
   static (int, Map<String, int>, Map<String, Stack>, InstructionPointerStack) runDebug(String code) {
-    var (instructions, labelToInstr) = Parser.parse(code);
-    return Interpreter.runDebug(instructions, labelToInstr);
+    ParserResult parserResult = Parser.parse(code);
+    return Interpreter.runDebug(parserResult);
   }
 }

@@ -11,8 +11,7 @@ sealed class StackInt {
   String get txt;
 }
 
-class Integer
-    implements Argument, Number, Memorizable, StackInt {
+class Integer implements Argument, Number, Memorizable, StackInt {
   final int value;
   Integer(this.value);
 
@@ -72,6 +71,13 @@ class Stkptr implements Argument, Memorizable, StackInt {
       return Integer(1);
     }
     return Integer(0);
+  }
+
+  static Stkptr? tryParse(String txt) {
+    if (txt.startsWith('%') && !txt.contains(" ") && !txt.contains("\n")) {
+      return Stkptr(txt);
+    }
+    return null;
   }
 
   @override

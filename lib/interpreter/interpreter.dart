@@ -6,11 +6,11 @@ import 'package:mali/instruction/instruction.dart';
 import 'package:mali/interpreter/instr_pointer_stack.dart';
 import 'package:mali/interpreter/runtime_error.dart';
 import 'package:mali/interpreter/stack.dart';
+import 'package:mali/parser/parser.dart';
 
 class Interpreter {
-  static int run(
-      List<Instruction> instructions, Map<String, int> labelToInstr) {
-    var (exitVal, _, _, _) = runDebug(instructions, labelToInstr);
+  static int run(ParserResult parserResult) {
+    var (exitVal, _, _, _) = runDebug(parserResult);
     return exitVal;
   }
 
@@ -19,8 +19,11 @@ class Interpreter {
     Map<String, int> labelToInstr,
     Map<String, Stack> stacks,
     InstructionPointerStack iptrs
-  ) runDebug(List<Instruction> instructions, Map<String, int> labelToInstr) {
-    final Map<String, Stack> stacks = {};
+  ) runDebug(ParserResult parserResult) {
+    final Map<String, int> labelToInstr =
+        parserResult.textResult.labelInstrPointers;
+    final List<Instruction> instructions = parserResult.textResult.instructions;
+    final Map<String, Stack> stacks = parserResult.dataResult;
     final InstructionPointerStack iptrs = InstructionPointerStack.init();
 
     int i;
