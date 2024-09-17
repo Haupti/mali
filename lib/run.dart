@@ -1,5 +1,6 @@
-import 'package:mali/instruction/argument.dart';
+import 'package:mali/interpreter/instr_pointer_stack.dart';
 import 'package:mali/interpreter/interpreter.dart';
+import 'package:mali/interpreter/stack.dart';
 import 'package:mali/parser/parser.dart';
 
 class Runner {
@@ -7,7 +8,7 @@ class Runner {
     var (instructions, labelToInstr) = Parser.parse(code);
     return Interpreter.run(instructions, labelToInstr);
   }
-  static (int, Map<String, int>, Map<String, Stack>, Map<String, List<Memorizable>>, InstructionPointerStack) runDebug(String code) {
+  static (int, Map<String, int>, Map<String, Stack>, InstructionPointerStack) runDebug(String code) {
     var (instructions, labelToInstr) = Parser.parse(code);
     return Interpreter.runDebug(instructions, labelToInstr);
   }

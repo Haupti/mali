@@ -16,6 +16,7 @@ class Parser {
     for (final (linenr, line) in linesAndContents.indexed) {
       parts = line.split(" ");
       switch (parts) {
+        /*
         case ['REMH', String arg]:
           instructions.add((labels) => REMHInstruction(
               _ArgumentParser.verifiedMemorypointer(linenr, arg)));
@@ -43,6 +44,7 @@ class Parser {
               _ArgumentParser.verifiedMemorypointer(linenr, memptr),
               _ArgumentParser.verifiedInteger(linenr, pos).value,
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
+              */
         case ['JMP0', String stkptr, String label]:
           instructions.add((labels) => JMP0Instruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr),
@@ -94,13 +96,13 @@ class Parser {
               _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
         case ['OUT', String memptr]:
           instructions.add((labels) => OUTInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, memptr)));
+              _ArgumentParser.verifiedStackpointer(linenr, memptr)));
         case ['ALLOC', String memptr]:
           instructions.add((labels) => ALLOCInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, memptr)));
+              _ArgumentParser.verifiedStackpointer(linenr, memptr)));
         case ['FREE', String memptr]:
           instructions.add((labels) => FREEInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, memptr)));
+              _ArgumentParser.verifiedStackpointer(linenr, memptr)));
         case ['RET']:
           instructions.add((labels) => RETInstruction());
         case ['EQV', String stkptr, String value]:
@@ -205,6 +207,7 @@ class _ArgumentParser {
     return Stkptr(txt);
   }
 
+  /*
   static Memptr verifiedMemorypointer(int index, String txt) {
     if (txt.length < 2) {
       throw ParserError("memptr missing", index);
@@ -220,6 +223,7 @@ class _ArgumentParser {
     }
     return Memptr(txt);
   }
+  */
 
   static Number verifiedNumber(int index, String txt) {
     if (txt.isEmpty) {
@@ -269,6 +273,7 @@ class _ArgumentParser {
     }
   }
 
+  /*
   static StackIntFloat verifiedStackIntFloat(int index, String arg) {
     if (arg.startsWith("\$")) {
       return _ArgumentParser.verifiedStackpointer(index, arg);
@@ -278,6 +283,7 @@ class _ArgumentParser {
       return _ArgumentParser.verifiedInteger(index, arg);
     }
   }
+    */
 }
 
 class ParserError extends Error {

@@ -3,79 +3,14 @@ import 'dart:io';
 
 import 'package:mali/instruction/argument.dart';
 import 'package:mali/instruction/instruction.dart';
-
-class RuntimeError extends Error {
-  String message;
-  RuntimeError(this.message);
-  @override
-  String toString() {
-    return "RUNTIME ERROR: $message";
-  }
-}
-
-class Stack {
-  final List<Memorizable> _mem;
-  Stack(this._mem);
-  void push(Memorizable value) {
-    _mem.add(value);
-  }
-
-  Memorizable? pop() {
-    if (_mem.isEmpty) {
-      return null;
-    }
-    return _mem.last;
-  }
-
-  static Stack init() {
-    return Stack([]);
-  }
-
-  Memorizable? peekHead() {
-    if (_mem.isEmpty) {
-      return null;
-    }
-    return _mem.last;
-  }
-
-  int depth() {
-    return _mem.length;
-  }
-
-  List<Memorizable> debug() {
-    return _mem;
-  }
-}
-
-class InstructionPointerStack {
-  final List<int> _iptrs;
-  InstructionPointerStack(this._iptrs);
-  void push(int value) {
-    _iptrs.add(value);
-  }
-
-  int? pop(int index) {
-    if (_iptrs.isEmpty) {
-      return null;
-    }
-    int pos = _iptrs.last;
-    _iptrs.removeLast();
-    return pos;
-  }
-
-  static InstructionPointerStack init() {
-    return InstructionPointerStack([]);
-  }
-
-  int get length {
-    return _iptrs.length;
-  }
-}
+import 'package:mali/interpreter/instr_pointer_stack.dart';
+import 'package:mali/interpreter/runtime_error.dart';
+import 'package:mali/interpreter/stack.dart';
 
 class Interpreter {
   static int run(
       List<Instruction> instructions, Map<String, int> labelToInstr) {
-    var (exitVal, _, _, _, _) = runDebug(instructions, labelToInstr);
+    var (exitVal, _, _, _) = runDebug(instructions, labelToInstr);
     return exitVal;
   }
 
@@ -83,11 +18,9 @@ class Interpreter {
     int exitVal,
     Map<String, int> labelToInstr,
     Map<String, Stack> stacks,
-    Map<String, List<Memorizable>> memory,
     InstructionPointerStack iptrs
   ) runDebug(List<Instruction> instructions, Map<String, int> labelToInstr) {
     final Map<String, Stack> stacks = {};
-    final Map<String, List<Memorizable>> memory = {};
     final InstructionPointerStack iptrs = InstructionPointerStack.init();
 
     int i;
@@ -95,6 +28,20 @@ class Interpreter {
     for (i = 0; i < instructions.length; i++) {
       instr = instructions[i];
       switch (instr) {
+        case EXITInstruction _:
+          runExit(stacks, instr.argument, i);
+        case ALLOCInstruction _:
+          if (stacks[instr.stkptr.value] != null) {
+            throw RuntimeError(
+                "(ALLOC, $i) stack at is already allocated ${instr.stkptr.value}");
+          }
+          stacks[instr.stkptr.value] = Stack.init();
+        case FREEInstruction _:
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError(
+                "(FREE, $i) stack is not allocated ${instr.stkptr.value}");
+          }
+          stacks.remove(instr.stkptr.value);
         case ORInstruction _:
           if (stacks[instr.stkptr.value] == null ||
               stacks[instr.stkptr.value]!.depth() < 2) {
@@ -221,17 +168,17 @@ class Interpreter {
             stacks[instr.stkptr.value]!.push(instr.value);
           }
         case OUTInstruction _:
-          List<Memorizable>? mem = memory[instr.memptr.value];
-          if (mem == null) {
+          Stack? stk = stacks[instr.stkptr.value];
+          if (stk == null) {
             throw RuntimeError(
-                "(OUT, $i) memory is not allocated ${instr.memptr.value}");
+                "(OUT, $i) stack is not allocated ${instr.stkptr.value}");
           }
-          List<int> ints = mem.map((it) {
+          List<int> ints = stk.values.map((it) {
             if (it is Integer) {
               return it.value;
             } else {
               throw RuntimeError(
-                  "(OUT, $i) memory expected to be integers only");
+                  "(OUT, $i) stack expected to be integers only");
             }
           }).toList();
           print(utf8.decode(ints));
@@ -288,117 +235,9 @@ class Interpreter {
           i = res - 1;
         case LABELInstruction _:
           continue;
-        case REMLInstruction _:
-          if (memory[instr.memptr.value] == null) {
-            throw RuntimeError(
-                "(REML, $i) memory at is not allocated ${instr.memptr.value}");
-          }
-          memory[instr.memptr.value]!.removeLast();
-        case REMHInstruction _:
-          if (memory[instr.memptr.value] == null) {
-            throw RuntimeError(
-                "(REMH, $i) memory at is not allocated ${instr.memptr.value}");
-          }
-          memory[instr.memptr.value]!.removeAt(0);
-        case STOREHInstruction _:
-          if (memory[instr.dest.value] == null) {
-            throw RuntimeError(
-                "(STOREH, $i) memory at is not allocated ${instr.dest.value}");
-          }
-          switch (instr.src) {
-            case Integer val:
-              memory[instr.dest.value]!.add(val);
-            case Float val:
-              memory[instr.dest.value]!.add(val);
-            case Stkptr stk:
-              if (stacks[stk.value] == null) {
-                throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
-              } else {
-                Memorizable? value = stacks[stk.value]!.pop();
-                if (value == null) {
-                  throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
-                }
-                memory[instr.dest.value]!.insert(0, value);
-              }
-          }
-        case STOREInstruction _:
-          if (memory[instr.dest.value] == null) {
-            throw RuntimeError(
-                "(STORE, $i) memory at is not allocated ${instr.dest.value}");
-          }
-          switch (instr.src) {
-            case Integer val:
-              memory[instr.dest.value]!.add(val);
-            case Float val:
-              memory[instr.dest.value]!.add(val);
-            case Stkptr stk:
-              if (stacks[stk.value] == null) {
-                throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
-              } else {
-                Memorizable? value = stacks[stk.value]!.pop();
-                if (value == null) {
-                  throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
-                }
-                memory[instr.dest.value]!.add(value);
-              }
-          }
-
-        case EXITInstruction _:
-          runExit(stacks, instr.argument, i);
-        case ALLOCInstruction _:
-          if (memory[instr.memptr.value] != null) {
-            throw RuntimeError(
-                "(ALLOC, $i) memory at is already allocated ${instr.memptr.value}");
-          }
-          memory[instr.memptr.value] = [];
-        case FREEInstruction _:
-          if (memory[instr.memptr.value] == null) {
-            throw RuntimeError(
-                "(FREE, $i) memory is not allocated ${instr.memptr.value}");
-          }
-          memory.remove(instr.memptr.value);
-        case LOADInstruction _:
-          List<Memorizable>? mem = memory[instr.memptr.value];
-          if (mem == null) {
-            throw RuntimeError(
-                "(LOAD, $i) memory is not allocated ${instr.memptr.value}");
-          }
-          if (stacks[instr.stkptr.value] == null) {
-            stacks[instr.stkptr.value] = Stack.init();
-          }
-          if (instr.pos >= mem.length) {
-            throw RuntimeError("(LOAD, $i) no element at ${instr.pos}");
-          }
-          stacks[instr.stkptr.value]!.push(mem[instr.pos]);
-        case LOADHInstruction _:
-          List<Memorizable>? mem = memory[instr.memptr.value];
-          if (mem == null) {
-            throw RuntimeError(
-                "(LOADH, $i) memory is not allocated ${instr.memptr.value}");
-          }
-          if (stacks[instr.stkptr.value] == null) {
-            stacks[instr.stkptr.value] = Stack.init();
-          }
-          if (mem.isEmpty) {
-            throw RuntimeError("(LOADH, $i) no data at ${instr.stkptr.value}");
-          }
-          stacks[instr.stkptr.value]!.push(mem.first);
-        case LOADLInstruction _:
-          List<Memorizable>? mem = memory[instr.memptr.value];
-          if (mem == null) {
-            throw RuntimeError(
-                "(LOADH, $i) memory is not allocated ${instr.memptr.value}");
-          }
-          if (stacks[instr.stkptr.value] == null) {
-            stacks[instr.stkptr.value] = Stack.init();
-          }
-          if (mem.isEmpty) {
-            throw RuntimeError("(LOADL, $i) no data at ${instr.stkptr.value}");
-          }
-          stacks[instr.stkptr.value]!.push(mem.last);
       }
     }
-    return (1, labelToInstr, stacks, memory, iptrs);
+    return (1, labelToInstr, stacks, iptrs);
   }
 
   static Memorizable runOr(int index, Memorizable fst, Memorizable snd) {
@@ -583,3 +422,99 @@ class Interpreter {
     }
   }
 }
+          /*
+        case REMLInstruction _:
+          if (memory[instr.memptr.value] == null) {
+            throw RuntimeError(
+                "(REML, $i) memory at is not allocated ${instr.memptr.value}");
+          }
+          memory[instr.memptr.value]!.removeLast();
+        case REMHInstruction _:
+          if (memory[instr.memptr.value] == null) {
+            throw RuntimeError(
+                "(REMH, $i) memory at is not allocated ${instr.memptr.value}");
+          }
+          memory[instr.memptr.value]!.removeAt(0);
+        case STOREHInstruction _:
+          if (memory[instr.dest.value] == null) {
+            throw RuntimeError(
+                "(STOREH, $i) memory at is not allocated ${instr.dest.value}");
+          }
+          switch (instr.src) {
+            case Integer val:
+              memory[instr.dest.value]!.add(val);
+            case Float val:
+              memory[instr.dest.value]!.add(val);
+            case Stkptr stk:
+              if (stacks[stk.value] == null) {
+                throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
+              } else {
+                Memorizable? value = stacks[stk.value]!.pop();
+                if (value == null) {
+                  throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
+                }
+                memory[instr.dest.value]!.insert(0, value);
+              }
+          }
+        case STOREInstruction _:
+          if (memory[instr.dest.value] == null) {
+            throw RuntimeError(
+                "(STORE, $i) memory at is not allocated ${instr.dest.value}");
+          }
+          switch (instr.src) {
+            case Integer val:
+              memory[instr.dest.value]!.add(val);
+            case Float val:
+              memory[instr.dest.value]!.add(val);
+            case Stkptr stk:
+              if (stacks[stk.value] == null) {
+                throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
+              } else {
+                Memorizable? value = stacks[stk.value]!.pop();
+                if (value == null) {
+                  throw RuntimeError("(STORE, $i) stack is empty ${stk.value}");
+                }
+                memory[instr.dest.value]!.add(value);
+              }
+          }
+
+        case LOADInstruction _:
+          List<Memorizable>? mem = memory[instr.memptr.value];
+          if (mem == null) {
+            throw RuntimeError(
+                "(LOAD, $i) memory is not allocated ${instr.memptr.value}");
+          }
+          if (stacks[instr.stkptr.value] == null) {
+            stacks[instr.stkptr.value] = Stack.init();
+          }
+          if (instr.pos >= mem.length) {
+            throw RuntimeError("(LOAD, $i) no element at ${instr.pos}");
+          }
+          stacks[instr.stkptr.value]!.push(mem[instr.pos]);
+        case LOADHInstruction _:
+          List<Memorizable>? mem = memory[instr.memptr.value];
+          if (mem == null) {
+            throw RuntimeError(
+                "(LOADH, $i) memory is not allocated ${instr.memptr.value}");
+          }
+          if (stacks[instr.stkptr.value] == null) {
+            stacks[instr.stkptr.value] = Stack.init();
+          }
+          if (mem.isEmpty) {
+            throw RuntimeError("(LOADH, $i) no data at ${instr.stkptr.value}");
+          }
+          stacks[instr.stkptr.value]!.push(mem.first);
+        case LOADLInstruction _:
+          List<Memorizable>? mem = memory[instr.memptr.value];
+          if (mem == null) {
+            throw RuntimeError(
+                "(LOADH, $i) memory is not allocated ${instr.memptr.value}");
+          }
+          if (stacks[instr.stkptr.value] == null) {
+            stacks[instr.stkptr.value] = Stack.init();
+          }
+          if (mem.isEmpty) {
+            throw RuntimeError("(LOADL, $i) no data at ${instr.stkptr.value}");
+          }
+          stacks[instr.stkptr.value]!.push(mem.last);
+         */

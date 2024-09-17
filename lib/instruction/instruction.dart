@@ -6,88 +6,20 @@ sealed class Instruction {
 
 class ALLOCInstruction implements Instruction {
   // ALLOC %
-  final Memptr memptr;
-  ALLOCInstruction(this.memptr);
+  final Stkptr stkptr;
+  ALLOCInstruction(this.stkptr);
 
   @override
-  String get txt => "ALLOC ${memptr.value}";
+  String get txt => "ALLOC ${stkptr.value}";
 }
 
 class FREEInstruction implements Instruction {
   // FREE %
-  final Memptr memptr;
-  FREEInstruction(this.memptr);
-  @override
-  String get txt => "FREE ${memptr.value}";
-}
-
-class LOADInstruction implements Instruction {
-  // LOAD % i $
-  final Memptr memptr;
-  final int pos;
   final Stkptr stkptr;
-  LOADInstruction(this.memptr, this.pos, this.stkptr);
-
+  FREEInstruction(this.stkptr);
   @override
-  String get txt => "LOAD ${memptr.txt} $pos ${stkptr.txt}";
+  String get txt => "FREE ${stkptr.value}";
 }
-
-class LOADHInstruction implements Instruction {
-  // LOADH % $
-  final Memptr memptr;
-  final Stkptr stkptr;
-  LOADHInstruction(this.memptr, this.stkptr);
-
-  @override
-  String get txt => "LOADH ${memptr.txt} ${stkptr.txt}";
-}
-
-class LOADLInstruction implements Instruction {
-  // LOADL % $
-  final Memptr memptr;
-  final Stkptr stkptr;
-  LOADLInstruction(this.memptr, this.stkptr);
-
-  @override
-  String get txt => "LOADL ${memptr.txt} ${stkptr.txt}";
-}
-
-class STOREInstruction implements Instruction {
-  // STORE ($,i,f) %
-  final StackIntFloat src;
-  final Memptr dest;
-  STOREInstruction(this.src, this.dest);
-
-  @override
-  String get txt => "STORE ${src.txt} ${dest.txt}";
-}
-
-class STOREHInstruction implements Instruction {
-  // STOREH $ %
-  final StackIntFloat src;
-  final Memptr dest;
-  STOREHInstruction(this.src, this.dest);
-
-  @override
-  String get txt => "STOREH ${src.txt} ${dest.txt}";
-}
-
-class REMLInstruction implements Instruction {
-  // REML %
-  final Memptr memptr;
-  REMLInstruction(this.memptr);
-  @override
-  String get txt => "REML ${memptr.value}";
-}
-
-class REMHInstruction implements Instruction {
-  // REMH %
-  final Memptr memptr;
-  REMHInstruction(this.memptr);
-  @override
-  String get txt => "REMH ${memptr.value}";
-}
-
 class LABELInstruction implements Instruction {
   // LABEL label
   final Label label;
@@ -144,10 +76,10 @@ class EXITInstruction implements Instruction {
 
 class OUTInstruction implements Instruction {
   // OUT %
-  final Memptr memptr;
-  OUTInstruction(this.memptr);
+  final Stkptr stkptr;
+  OUTInstruction(this.stkptr);
   @override
-  String get txt => "OUT ${memptr.value}";
+  String get txt => "OUT ${stkptr.value}";
 }
 
 class PUSHInstruction implements Instruction {
@@ -257,3 +189,141 @@ class ORInstruction implements Instruction {
   @override
   String get txt => "OR ${stkptr.value}";
 }
+/*
+class LOADInstruction implements Instruction {
+  // LOAD % i $
+  final Memptr memptr;
+  final int pos;
+  final Stkptr stkptr;
+  LOADInstruction(this.memptr, this.pos, this.stkptr);
+
+  @override
+  String get txt => "LOAD ${memptr.txt} $pos ${stkptr.txt}";
+}
+
+class LOADHInstruction implements Instruction {
+  // LOADH % $
+  final Memptr memptr;
+  final Stkptr stkptr;
+  LOADHInstruction(this.memptr, this.stkptr);
+
+  @override
+  String get txt => "LOADH ${memptr.txt} ${stkptr.txt}";
+}
+
+class LOADLInstruction implements Instruction {
+  // LOADL % $
+  final Memptr memptr;
+  final Stkptr stkptr;
+  LOADLInstruction(this.memptr, this.stkptr);
+
+  @override
+  String get txt => "LOADL ${memptr.txt} ${stkptr.txt}";
+}
+
+class STOREInstruction implements Instruction {
+  // STORE ($,i,f) %
+  final StackIntFloat src;
+  final Memptr dest;
+  STOREInstruction(this.src, this.dest);
+
+  @override
+  String get txt => "STORE ${src.txt} ${dest.txt}";
+}
+
+class STOREHInstruction implements Instruction {
+  // STOREH $ %
+  final StackIntFloat src;
+  final Memptr dest;
+  STOREHInstruction(this.src, this.dest);
+
+  @override
+  String get txt => "STOREH ${src.txt} ${dest.txt}";
+}
+
+class REMLInstruction implements Instruction {
+  // REML %
+  final Memptr memptr;
+  REMLInstruction(this.memptr);
+  @override
+  String get txt => "REML ${memptr.value}";
+}
+
+class REMHInstruction implements Instruction {
+  // REMH %
+  final Memptr memptr;
+  REMHInstruction(this.memptr);
+  @override
+  String get txt => "REMH ${memptr.value}";
+}
+
+*/
+/*
+class LOADInstruction implements Instruction {
+  // LOAD % i $
+  final Memptr memptr;
+  final int pos;
+  final Stkptr stkptr;
+  LOADInstruction(this.memptr, this.pos, this.stkptr);
+
+  @override
+  String get txt => "LOAD ${memptr.txt} $pos ${stkptr.txt}";
+}
+
+class LOADHInstruction implements Instruction {
+  // LOADH % $
+  final Memptr memptr;
+  final Stkptr stkptr;
+  LOADHInstruction(this.memptr, this.stkptr);
+
+  @override
+  String get txt => "LOADH ${memptr.txt} ${stkptr.txt}";
+}
+
+class LOADLInstruction implements Instruction {
+  // LOADL % $
+  final Memptr memptr;
+  final Stkptr stkptr;
+  LOADLInstruction(this.memptr, this.stkptr);
+
+  @override
+  String get txt => "LOADL ${memptr.txt} ${stkptr.txt}";
+}
+
+class STOREInstruction implements Instruction {
+  // STORE ($,i,f) %
+  final StackIntFloat src;
+  final Memptr dest;
+  STOREInstruction(this.src, this.dest);
+
+  @override
+  String get txt => "STORE ${src.txt} ${dest.txt}";
+}
+
+class STOREHInstruction implements Instruction {
+  // STOREH $ %
+  final StackIntFloat src;
+  final Memptr dest;
+  STOREHInstruction(this.src, this.dest);
+
+  @override
+  String get txt => "STOREH ${src.txt} ${dest.txt}";
+}
+
+class REMLInstruction implements Instruction {
+  // REML %
+  final Memptr memptr;
+  REMLInstruction(this.memptr);
+  @override
+  String get txt => "REML ${memptr.value}";
+}
+
+class REMHInstruction implements Instruction {
+  // REMH %
+  final Memptr memptr;
+  REMHInstruction(this.memptr);
+  @override
+  String get txt => "REMH ${memptr.value}";
+}
+
+*/

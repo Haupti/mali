@@ -7,16 +7,12 @@ sealed class Memorizable {
 
 sealed class Number implements Memorizable {}
 
-sealed class StackIntFloat {
-  String get txt;
-}
-
 sealed class StackInt {
   String get txt;
 }
 
 class Integer
-    implements Argument, Number, Memorizable, StackIntFloat, StackInt {
+    implements Argument, Number, Memorizable, StackInt {
   final int value;
   Integer(this.value);
 
@@ -32,7 +28,7 @@ class Integer
   String get txt => "$value";
 }
 
-class Float implements Argument, Number, Memorizable, StackIntFloat {
+class Float implements Argument, Number, Memorizable {
   final double value;
   Float(this.value);
 
@@ -48,6 +44,7 @@ class Float implements Argument, Number, Memorizable, StackIntFloat {
   String get txt => "$value";
 }
 
+/*
 class Memptr implements Argument, Memorizable {
   final String value;
   Memptr(this.value);
@@ -63,10 +60,19 @@ class Memptr implements Argument, Memorizable {
   @override
   String get txt => value;
 }
+*/
 
-class Stkptr implements Argument, StackIntFloat, StackInt {
+class Stkptr implements Argument, Memorizable, StackInt {
   final String value;
   Stkptr(this.value);
+
+  @override
+  Integer isEqualTo(Memorizable other) {
+    if (other is Stkptr && other.value == value) {
+      return Integer(1);
+    }
+    return Integer(0);
+  }
 
   @override
   String get txt => value;

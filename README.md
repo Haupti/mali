@@ -64,3 +64,5 @@ MOD $ - pops head and head of tail from stack calculates modulo head by head of 
 
 AND $ - pops head and head of tail from stack and checks if both are 1, puts 1 on stack if true, 0 otherwise
 OR $ - pops head and head of tail from stack and checks if one is 1, puts 1 on stack if true, 0 otherwise
+
+
