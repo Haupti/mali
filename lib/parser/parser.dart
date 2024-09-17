@@ -201,8 +201,8 @@ class _ArgumentParser {
       throw ParserError(
           "stackpointer names must start with lowercase latin letter", index);
     }
-    if (txt[0] != "\$") {
-      throw ParserError("stackpointers must start with \$", index);
+    if (txt[0] != "%") {
+      throw ParserError("stackpointers must start with %", index);
     }
     return Stkptr(txt);
   }
@@ -241,18 +241,6 @@ class _ArgumentParser {
     throw ParserError("expected a number argument", index);
   }
 
-  static Float verifiedFloat(int index, String txt) {
-    if (txt.isEmpty) {
-      throw ParserError("argument missing", index);
-    }
-    double? res = double.tryParse(txt);
-    if (res != null) {
-      return Float(res);
-    }
-
-    throw ParserError("expected a integer argument", index);
-  }
-
   static Integer verifiedInteger(int index, String txt) {
     if (txt.isEmpty) {
       throw ParserError("argument missing", index);
@@ -274,6 +262,18 @@ class _ArgumentParser {
   }
 
   /*
+  static Float verifiedFloat(int index, String txt) {
+    if (txt.isEmpty) {
+      throw ParserError("argument missing", index);
+    }
+    double? res = double.tryParse(txt);
+    if (res != null) {
+      return Float(res);
+    }
+
+    throw ParserError("expected a integer argument", index);
+  }
+
   static StackIntFloat verifiedStackIntFloat(int index, String arg) {
     if (arg.startsWith("\$")) {
       return _ArgumentParser.verifiedStackpointer(index, arg);
