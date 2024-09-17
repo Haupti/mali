@@ -1,5 +1,6 @@
 import 'package:mali/instruction/argument.dart';
 import 'package:mali/instruction/instruction.dart';
+import 'package:mali/parser/parser_error.dart';
 
 typedef ParserResult = (
   List<Instruction> instructions,
@@ -16,35 +17,6 @@ class Parser {
     for (final (linenr, line) in linesAndContents.indexed) {
       parts = line.split(" ");
       switch (parts) {
-        /*
-        case ['REMH', String arg]:
-          instructions.add((labels) => REMHInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, arg)));
-        case ['REML', String arg]:
-          instructions.add((labels) => REMLInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, arg)));
-        case ['STOREH', String fst, String snd]:
-          instructions.add((labels) => STOREHInstruction(
-              _ArgumentParser.verifiedStackpointer(linenr, fst),
-              _ArgumentParser.verifiedMemorypointer(linenr, snd)));
-        case ['STORE', String fst, String snd]:
-          instructions.add((labels) => STOREInstruction(
-              _ArgumentParser.verifiedStackIntFloat(linenr, fst),
-              _ArgumentParser.verifiedMemorypointer(linenr, snd)));
-        case ['LOADL', String memptr, String stkptr]:
-          instructions.add((labels) => LOADLInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, memptr),
-              _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
-        case ['LOADH', String memptr, String stkptr]:
-          instructions.add((labels) => LOADHInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, memptr),
-              _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
-        case ['LOAD', String memptr, String pos, String stkptr]:
-          instructions.add((labels) => LOADInstruction(
-              _ArgumentParser.verifiedMemorypointer(linenr, memptr),
-              _ArgumentParser.verifiedInteger(linenr, pos).value,
-              _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
-              */
         case ['JMP0', String stkptr, String label]:
           instructions.add((labels) => JMP0Instruction(
               _ArgumentParser.verifiedStackpointer(linenr, stkptr),
@@ -286,13 +258,32 @@ class _ArgumentParser {
     */
 }
 
-class ParserError extends Error {
-  String message;
-  int lineIndex;
-  ParserError(this.message, this.lineIndex);
-
-  @override
-  String toString() {
-    return "PARSER ERROR at line $lineIndex: $message";
-  }
-}
+        /*
+        case ['REMH', String arg]:
+          instructions.add((labels) => REMHInstruction(
+              _ArgumentParser.verifiedMemorypointer(linenr, arg)));
+        case ['REML', String arg]:
+          instructions.add((labels) => REMLInstruction(
+              _ArgumentParser.verifiedMemorypointer(linenr, arg)));
+        case ['STOREH', String fst, String snd]:
+          instructions.add((labels) => STOREHInstruction(
+              _ArgumentParser.verifiedStackpointer(linenr, fst),
+              _ArgumentParser.verifiedMemorypointer(linenr, snd)));
+        case ['STORE', String fst, String snd]:
+          instructions.add((labels) => STOREInstruction(
+              _ArgumentParser.verifiedStackIntFloat(linenr, fst),
+              _ArgumentParser.verifiedMemorypointer(linenr, snd)));
+        case ['LOADL', String memptr, String stkptr]:
+          instructions.add((labels) => LOADLInstruction(
+              _ArgumentParser.verifiedMemorypointer(linenr, memptr),
+              _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
+        case ['LOADH', String memptr, String stkptr]:
+          instructions.add((labels) => LOADHInstruction(
+              _ArgumentParser.verifiedMemorypointer(linenr, memptr),
+              _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
+        case ['LOAD', String memptr, String pos, String stkptr]:
+          instructions.add((labels) => LOADInstruction(
+              _ArgumentParser.verifiedMemorypointer(linenr, memptr),
+              _ArgumentParser.verifiedInteger(linenr, pos).value,
+              _ArgumentParser.verifiedStackpointer(linenr, stkptr)));
+              */

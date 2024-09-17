@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 void main() {
   test('fizzbuzz test 1', () {
     var (exitVal, labelToInstr, stacks, iptrs) = Runner.runDebug("""
+      ALLOC %fb
       PUSH 3 %fb
       PUSH 1 %fb
       MOD %fb
@@ -29,6 +30,7 @@ void main() {
   });
   test('ret works', () {
     var (exitVal, labelToInstr, stacks, iptrs) = Runner.runDebug("""
+      ALLOC %a
       CALL func
       CALL skip
 
@@ -46,6 +48,7 @@ void main() {
   });
   test('jmp0 jumps', () {
     var (exitVal, labelToInstr, stacks, iptrs) = Runner.runDebug("""
+      ALLOC %a
       PUSH 0 %a
       JMP0 %a skip
       PUSH 42 %a
@@ -59,6 +62,7 @@ void main() {
   });
   test('jmp0 doesnt jump', () {
     var (exitVal, labelToInstr, stacks, iptrs) = Runner.runDebug("""
+      ALLOC %a
       PUSH 1 %a
       JMP0 %a skip
       PUSH 42 %a
@@ -72,6 +76,7 @@ void main() {
   });
   test('jmp1 jumps', () {
     var (exitVal, labelToInstr, stacks, iptrs) = Runner.runDebug("""
+      ALLOC %a
       PUSH 1 %a
       JMP1 %a skip
       PUSH 42 %a
@@ -85,6 +90,7 @@ void main() {
   });
   test('jmp1 doesnt jump', () {
     var (exitVal, labelToInstr, stacks, iptrs) = Runner.runDebug("""
+      ALLOC %a
       PUSH 0 %a
       JMP1 %a skip
       PUSH 42 %a

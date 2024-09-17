@@ -33,94 +33,97 @@ class Interpreter {
         case ALLOCInstruction _:
           if (stacks[instr.stkptr.value] != null) {
             throw RuntimeError(
-                "(ALLOC, $i) stack at is already allocated ${instr.stkptr.value}");
+                "(ALLOC, $i) already allocated ${instr.stkptr.value}");
           }
           stacks[instr.stkptr.value] = Stack.init();
         case FREEInstruction _:
           if (stacks[instr.stkptr.value] == null) {
-            throw RuntimeError(
-                "(FREE, $i) stack is not allocated ${instr.stkptr.value}");
+            throw RuntimeError("(FREE, $i) nullpointer ${instr.stkptr.value}");
           }
           stacks.remove(instr.stkptr.value);
         case ORInstruction _:
           if (stacks[instr.stkptr.value] == null ||
               stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(OR, $i) not enough values on stack: ${instr.stkptr.value}");
+            throw RuntimeError("(OR, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
           stacks[instr.stkptr.value]!.push(runOr(i, head, hot));
         case ANDInstruction _:
-          if (stacks[instr.stkptr.value] == null ||
-              stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(AND, $i) not enough values on stack: ${instr.stkptr.value}");
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError("(AND, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError("(AND, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
           stacks[instr.stkptr.value]!.push(runAnd(i, head, hot));
         case MODInstruction _:
-          if (stacks[instr.stkptr.value] == null ||
-              stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(MOD, $i) not enough values on stack: ${instr.stkptr.value}");
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError("(MOD, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError("(MOD, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
           stacks[instr.stkptr.value]!.push(runMod(i, head, hot));
         case DIVInstruction _:
-          if (stacks[instr.stkptr.value] == null ||
-              stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(DIV, $i) not enough values on stack: ${instr.stkptr.value}");
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError("(DIV, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError("(DIV, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
           stacks[instr.stkptr.value]!.push(runDiv(i, head, hot));
         case MULInstruction _:
-          if (stacks[instr.stkptr.value] == null ||
-              stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(MUL, $i) not enough values on stack: ${instr.stkptr.value}");
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError("(MUL, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError("(MUL, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
           stacks[instr.stkptr.value]!.push(runMul(i, head, hot));
         case SUBInstruction _:
-          if (stacks[instr.stkptr.value] == null ||
-              stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(SUB, $i) not enough values on stack: ${instr.stkptr.value}");
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError("(SUB, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError("(SUB, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
           stacks[instr.stkptr.value]!.push(runSub(i, head, hot));
         case ADDInstruction _:
-          if (stacks[instr.stkptr.value] == null ||
-              stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(ADD, $i) not enough values on stack: ${instr.stkptr.value}");
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError("(ADD, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError("(ADD, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
           stacks[instr.stkptr.value]!.push(runAdd(i, head, hot));
         case EQVInstruction _:
           if (stacks[instr.stkptr.value] == null) {
-            throw RuntimeError(
-                "(EQV, $i) not enough values on stack: ${instr.stkptr.value}");
+            throw RuntimeError("(EQV, $i) nullpointer: ${instr.stkptr.value}");
           }
           Memorizable? head = stacks[instr.stkptr.value]!.pop();
           if (head == null) {
-            throw RuntimeError(
-                "(EQV, $i) not enough values on stack: ${instr.stkptr.value}");
+            throw RuntimeError("(EQV, $i) no value: ${instr.stkptr.value}");
           }
           stacks[instr.stkptr.value]!.push(head.isEqualTo(instr.value));
         case EQInstruction _:
-          if (stacks[instr.stkptr.value] == null ||
-              stacks[instr.stkptr.value]!.depth() < 2) {
-            throw RuntimeError(
-                "(EQ, $i) not enough values on stack: ${instr.stkptr.value}");
+          if (stacks[instr.stkptr.value] == null) {
+            throw RuntimeError("(EQ, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stacks[instr.stkptr.value]!.depth() < 2) {
+            throw RuntimeError("(EQ, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable head = stacks[instr.stkptr.value]!.pop()!;
           Memorizable hot = stacks[instr.stkptr.value]!.pop()!;
@@ -133,52 +136,45 @@ class Interpreter {
           stacks[instr.stkptr.value]!.pop();
         case MOVInstruction _:
           if (stacks[instr.src.value] == null) {
-            throw RuntimeError(
-                "(MOV, $i) move soure is empty: ${instr.src.value}");
+            throw RuntimeError("(MOV, $i) nullpointer: ${instr.src.value}");
           }
           if (stacks[instr.dest.value] == null) {
-            stacks[instr.dest.value] = Stack.init();
+            throw RuntimeError("(MOV, $i) nullpointer: ${instr.src.value}");
           }
           Memorizable? val = stacks[instr.src.value]!.pop();
           if (val == null) {
-            throw RuntimeError(
-                "(MOV, $i) move soure is empty: ${instr.src.value}");
+            throw RuntimeError("(MOV, $i) no value: ${instr.src.value}");
           }
           stacks[instr.dest.value]!.push(val);
         case CPYInstruction _:
           if (stacks[instr.src.value] == null) {
-            throw RuntimeError(
-                "(CPY, $i) copy soure is empty: ${instr.src.value}");
+            throw RuntimeError("(CPY, $i) nullpointer: ${instr.src.value}");
           }
           if (stacks[instr.dest.value] == null) {
-            stacks[instr.dest.value] = Stack.init();
+            throw RuntimeError("(CPY, $i) nullpointer: ${instr.dest.value}");
           }
           Memorizable? val = stacks[instr.src.value]!.peekHead();
           if (val == null) {
-            throw RuntimeError(
-                "(CPY, $i) copy soure is empty: ${instr.src.value}");
+            throw RuntimeError("(CPY, $i) no value: ${instr.src.value}");
           }
           stacks[instr.dest.value]!.push(val);
         case PUSHInstruction _:
           Stack? stk = stacks[instr.stkptr.value];
           if (stk == null) {
-            stacks[instr.stkptr.value] = Stack.init();
-            stacks[instr.stkptr.value]!.push(instr.value);
+            throw RuntimeError("(PUSH, $i) nullpointer: ${instr.stkptr.value}");
           } else {
             stacks[instr.stkptr.value]!.push(instr.value);
           }
         case OUTInstruction _:
           Stack? stk = stacks[instr.stkptr.value];
           if (stk == null) {
-            throw RuntimeError(
-                "(OUT, $i) stack is not allocated ${instr.stkptr.value}");
+            throw RuntimeError("(OUT, $i) nullpointer ${instr.stkptr.value}");
           }
           List<int> ints = stk.values.map((it) {
             if (it is Integer) {
               return it.value;
             } else {
-              throw RuntimeError(
-                  "(OUT, $i) stack expected to be integers only");
+              throw RuntimeError("(OUT, $i) expected int");
             }
           }).toList();
           print(utf8.decode(ints));
@@ -188,8 +184,11 @@ class Interpreter {
             throw RuntimeError("(JMP1, $i) label not defined");
           }
           Stack? stack = stacks[instr.stkptr.value];
-          if (stack == null || stack.peekHead() == null) {
-            throw RuntimeError("(JMP1, $i) stack empty: ${instr.stkptr.value}");
+          if (stack == null) {
+            throw RuntimeError("(JMP1, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stack.peekHead() == null) {
+            throw RuntimeError("(JMP1, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable? val = stack.peekHead();
           if (val is Integer && val.value == 1) {
@@ -201,8 +200,11 @@ class Interpreter {
             throw RuntimeError("(JMP0, $i) label not defined");
           }
           Stack? stack = stacks[instr.stkptr.value];
-          if (stack == null || stack.peekHead() == null) {
-            throw RuntimeError("(JMP0, $i) stack empty: ${instr.stkptr.value}");
+          if (stack == null) {
+            throw RuntimeError("(JMP0, $i) nullpointer: ${instr.stkptr.value}");
+          }
+          if (stack.peekHead() == null) {
+            throw RuntimeError("(JMP0, $i) no value: ${instr.stkptr.value}");
           }
           Memorizable? val = stack.peekHead();
           if (val is Integer && val.value == 0) {
@@ -212,7 +214,7 @@ class Interpreter {
           int? res = iptrs.pop(i);
           if (res == null) {
             throw RuntimeError(
-                "(RET, $i) no instruction in instruction pointer stack to return to");
+                "(RET, $i) no instruction in instruction pointer stack");
           }
           // because in next iteration, i will be incremented and THEN be at the right position
           i = res;
