@@ -13,7 +13,7 @@ class DataParser {
       int splitPos = lines[i].indexOf(" ");
       var (name, body) = (
         lines[i].substring(0, splitPos),
-        lines[i].substring(splitPos+1, lines[i].length)
+        lines[i].substring(splitPos + 1, lines[i].length)
       );
 
       if (!name.startsWith('%')) {
@@ -23,33 +23,33 @@ class DataParser {
         if (result[name] != null) {
           throw ParserError("already allocated: '$name'", i);
         }
-        Stack stk = Stack.init();
+        List<Memorizable> data = [];
         for (final c in body.substring(1, body.length - 1).split("")) {
-          stk.push(Integer(c.codeUnitAt(0)));
+          data.add(Integer(c.codeUnitAt(0)));
         }
-        result[name] = stk;
+        result[name] = Stack(data.reversed.toList());
       } else {
         List<String> values = body.split(" ");
-        Stack stk = Stack.init();
+        List<Memorizable> data = [];
         for (final value in values) {
           double? doubl = double.tryParse(value);
           if (doubl != null) {
-            stk.push(Float(doubl));
+            data.add(Float(doubl));
             continue;
           }
           int? integer = int.tryParse(value);
           if (integer != null) {
-            stk.push(Integer(integer));
+            data.add(Integer(integer));
             continue;
           }
           Stkptr? stkptr = Stkptr.tryParse(value);
           if (stkptr != null) {
-            stk.push(stkptr);
+            data.add(stkptr);
             continue;
           }
           throw ParserError("no valid arguments", i);
         }
-        result[name] = stk;
+        result[name] = Stack(data.reversed.toList());
       }
     }
     return result;

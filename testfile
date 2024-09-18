@@ -1,13 +1,14 @@
-ALLOC %fizzbuzz
-PUSH 122 %fizzbuzz
-ALLOC %fizz
-PUSH 102 %fizz
-ALLOC %buzz
-PUSH 100 %buzz
+SECTION DATA
+
+%fizzbuzz "fizzbuzz"
+%fizz "fizz"
+%buzz "buzz"
+
+SECTION TEXT
 
 LABEL main
   ALLOC %fb_args
-  PUSH 17 %fb_args
+  PUSH 3 %fb_args
   CALL fizzbuzz
   FREE %fb_args
   EXIT 0
@@ -57,3 +58,5 @@ LABEL fizzbuzz
   OUT %fb
   FREE %fb
   RET
+
+
